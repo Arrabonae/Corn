@@ -26,12 +26,14 @@ The Data is a daily break down of the continuous futures prices with additional 
 
 
 Data structure and acceptable format
-Column          Decription                      Acceptable Format       Comment
-Open            Opening price of the day        Float or Int
-High            Highest price of the day        Float or Int
-Low             Lowest price of the day         Float or Int
-Last            Closing price of the day        Float or Int             Target value to predict
-Volume          Trading volume in ‘000          Float or Int             Needs to be formatted before loading into the model.
+
+|  Column    |     Decription            |         Acceptable Format  |    Comment|
+|------------|---------------------------|----------------------------|-----------|
+|Open        |    Opening price of the day |       Float or Int       |  
+|High        |    Highest price of the day |       Float or Int       |
+|Low         |    Lowest price of the day  |       Float or Int       |
+|Last        |    Closing price of the day |       Float or Int       |     Target value to predict
+|Volume      |    Trading volume in ‘000   |       Float or Int       |     Needs to be formatted before loading into the model.
 
 Rest of the Data is not essential for this model, but it can dynamically handle it.
 Data frequency is daily.
