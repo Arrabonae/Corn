@@ -24,7 +24,9 @@ https://www.quandl.com/data/CHRIS/CME_C5
 The ZC1! Continuous corn futures data is related to CBOT (Chicago commodity stock exchange) tradings based on the North American production and demand.
 The Data is a daily break down of the continuous futures prices with additional features which are helpful for prediction purposes.
 
-![Corn price](pictures/Corn.jpg)
+<# align="center">
+  <img width="460" height="300" src=pictures/Corn.jpg">
+</#>
 
 
 #### Data structure and acceptable format
