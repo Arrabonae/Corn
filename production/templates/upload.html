@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+ <title>Corn future Price LSTM network</title>
+</head>
+<body>
+ 
+  <div align="center" class="bg-info">
+ <h1>Please upload your historical data
+<br>Format of the file should be .csv</h1></div>
+ <div class="big" align="center">
+   <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+ <div class="alert alert-danger">{{message}}</div>
+
+ <form action="/forward/" method="post">
+    <button name="forwardBtn" type="submit">{{ forward_message }} </button>
+</form>
+  </form>
+ </div>
+</body>
+</html>
