@@ -22,7 +22,7 @@ def upload_form():
         if request.files:
             upload = request.files["file"]
             upload.save(os.path.join(app.config['UPLOAD'], 'data.csv'))
-            return render_template('upload.html', messgae= 'Your file has been saved as data.csv', forward_message='Click here to Predict')
+            return render_template('upload.html', message= 'Your file has been saved as data.csv', forward_message='Click here to Predict')
     return render_template('upload.html', forward_message='Please upload your data First!')
 
 #Define the prediction function
@@ -120,7 +120,7 @@ def predict():
     scaled_pred = scaler.inverse_transform(prediction)
 
     #Return the prediction to the user
-    return render_template('results.html', predicition = scaled_pred)
+    return render_template('results.html', prediction = scaled_pred)
 
 #Start the Flask application
 if __name__ == '__main__':
