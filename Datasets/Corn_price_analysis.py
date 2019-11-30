@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from mpl_finance import candlestick_ohlc
+from mpl_finance import candlestick_ohlcx
 from statsmodels.tsa.seasonal import seasonal_decompose
 
 
