@@ -86,11 +86,12 @@ def predict():
     #We have to make some shortcuts, as the LSTM network cannot handle the fact that there are no features in the future. 
     #Hence, the features are engineered as a way to project them (using mean) to the future, and therefore providing enough datapoints for the Network to work with.  
     def forecast(n_prediction, model):
-        prediction_list = dataset_shaped[-n_steps:][::-1]
+        look_back = 60 #so using 60 days wort of data to calculate the next mean
+        prediction_list = dataset_shaped[-look_back:][::-1]
         result = []
     
         for _ in range(n_prediction):
-            z = prediction_list[-n_steps:]
+            z = prediction_list[-look_back:]
             x, y = split(z, n_steps)
             out = model.predict(x)[0][0]
             features_mean= z.mean(axis=0)  #Projecting the features to the future
