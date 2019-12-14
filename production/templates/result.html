@@ -5,10 +5,11 @@
 </head>
 <body>
  <div class="bg-info" align="center">
- <h2>Results</h2>
- </div>
- <table style="width:100%">{{prediction}}</table>
- <div> Graph</div>
  <div><img src= '{{ plot_url }}'></img></div>
+ {% for table in tables %}
+            {{titles[loop.index]}}
+            {{ table|safe }}
+ {% endfor %}
+</div>
 </body>
 </html>

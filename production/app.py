@@ -155,6 +155,7 @@ def predict():
         plt.figure(figsize=(15,8))
         plt.xlabel('Dates')
         plt.ylabel('Closing Prices')
+        plt.title('Continuous Corn Futures Historical and Forecast Prices')
         plt.grid(True)
         plt.plot(inputs2['Last'], 'blue', label='Historical Data')
         plt.plot(dataset, 'red', label='Forecast')
@@ -168,7 +169,7 @@ def predict():
     plot_url = build_graph(final_scaled, inputs2, n_prediction)
 
     #Return the prediction to the user
-    return render_template('result.html', prediction = final_scaled, plot_url = plot_url)
+    return render_template('result.html', plot_url = plot_url, tables=[final_scaled.to_html(classes='data')], titles = final_scaled.columns.values)
 
 #Start the Flask application
 if __name__ == '__main__':
