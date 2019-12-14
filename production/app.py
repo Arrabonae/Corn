@@ -6,14 +6,19 @@ import tensorflow as tf
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from flask import Flask, request, jsonify, render_template, redirect
+import matplotlib.pyplot as plt
+import seaborn as sns
+from io import BytesIO
+import base64
+import datetime
 
 #Create the Flask API
 app = Flask(__name__)
 
 # Create a directory in a known location to save files to.
-app.config['UPLOAD'] = '/Users/snowwhite/Documents/Github/Project Osaka/production/uploads/'
-#app.config['UPLOAD'] = os.path.join(os.getcwd(),'/upload')
-#app.config['UPLOAD'] = os.path.join(os.path.realpath(),'/uploads')
+#app.config['UPLOAD'] = '/Users/snowwhite/Documents/Github/Project Osaka/production/uploads/'
+app.config['UPLOAD'] = os.path.join(os.getcwd(),'production/uploads')
+#app.config['UPLOAD'] = os.path.join(os.path.realpath('app.py'),'/uploads')
 
 #Load the data from upload
 @app.route('/', methods=['GET', 'POST'])
@@ -32,17 +37,18 @@ def upload_form():
 @app.route('/forward', methods=['GET', 'POST'])
 def predict():  
     #Read the data - in the proper format
-    def read_it():
-        inputs2 = pd.read_csv(os.path.join(app.config['UPLOAD'], 'data.csv'), index_col= 'Date') #Date added
+    def load_input_file():
+        inputs2 = pd.read_csv(os.path.join(app.config['UPLOAD'], 'data.csv'), parse_dates=['Date'])
+        inputs2.set_index('Date', inplace=True) #Date added
+        inputs2 = inputs2.dropna()
         cols = inputs2.columns
         return inputs2, cols
 
-    #MinMaxScaler, which is currently not in use. It was in use in the Design phase.  
-    def scale_it(scaler,inputs2, cols):
-        #scaler = MinMaxScaler()
-        inputs3 = pd.DataFrame(scaler.fit_transform(inputs2))
-        inputs3.columns = cols
-        return inputs3
+    def back_scale(y_train, y_hat):
+        scaler = MinMaxScaler()
+        y_train_scaled = pd.DataFrame(scaler.fit_transform(y_train.reshape(-1,1)))
+        y_hat_scaled = pd.DataFrame(scaler.inverse_transform(y_hat.reshape(-1,1)))
+        return y_hat_scaled
 
     #Reshape the date for LSTM use, As we use more than one Features (LSTM Network - usually takes 1 feature to work with - the Tensors need to reshaped
     def reshape (dataset, y_seq): 
@@ -85,8 +91,8 @@ def predict():
     #The reason for this that the LSTM network is unique ina  way that uses multiple features (trained with 4 features) in order to make predicitions on a datapoint basis, 
     #We have to make some shortcuts, as the LSTM network cannot handle the fact that there are no features in the future. 
     #Hence, the features are engineered as a way to project them (using mean) to the future, and therefore providing enough datapoints for the Network to work with.  
-    def forecast(n_prediction, model):
-        look_back = 60 #so using 60 days wort of data to calculate the next mean
+    def forecast(n_prediction, model,dataset_shaped,n_steps):
+        look_back = 120 #so using 60 days wort of data to calculate the next mean
         prediction_list = dataset_shaped[-look_back:][::-1]
         result = []
     
@@ -96,9 +102,26 @@ def predict():
             out = model.predict(x)[0][0]
             features_mean= z.mean(axis=0)  #Projecting the features to the future
             prediction_list = np.vstack((prediction_list,features_mean))
-        
             result.append(out)
         return result
+    
+#All the magic will happen from here
+
+#Variables
+    if not os.path.exists(os.path.join(app.config['UPLOAD'], 'data.csv')):
+        return print("Please upload your file first")
+ 
+    n_steps = 5 #How many days to use to predict, required for the model
+    n_prediction = 30 #How many day to predict ahead in the future
+    
+    inputs2, cols = load_input_file() # First of all we read the data in in the right format
+    #input3 = scale_it(scaler, inputs2, cols) # the data what we read, needs to be scaled with MinMaxScaler
+    dataset_shaped = reshape(inputs2, 'Last') #'Last' #format the scaled data for LSTM use (part 1, where are formatting the columns into arrays)
+    #np.save('shaped', dataset_shaped)
+    X, y = split(dataset_shaped, n_steps) #Also need to format the Scaled data into 4D tensors
+    #np.save('X_train', X)
+    #np.save('y_train', y)
+    n_features = X.shape[2] # This wariable is required for the model, gives the feature dimension
     
  #Define the LSTM architecture, the weights are loaded seperatelly, but I've decided to keep the architecture part of the main code for more transparency
     LSTM_model = tf.keras.models.Sequential([
@@ -116,30 +139,36 @@ def predict():
         tf.keras.layers.Dense(1),
         ])
     #Load the pre-trained weights into the model
-    LSTM_model.load_weights('/Users/snowwhite/Documents/Github/Project Osaka/production/weights.h5')
-    #LSTM_model.load_weights(os.path.join(os.path.realpath(), 'weights.h5')
+    #LSTM_model.load_weights('/Users/snowwhite/Documents/Github/Project Osaka/production/weights_3.h5')
+    LSTM_model.load_weights(os.path.join(os.getcwd(),'production/weights_3.h5'))
     adam=tf.keras.optimizers.Adam(lr=0.003711, epsilon=None, amsgrad=True, decay=0)
     LSTM_model.compile(loss ='mean_squared_error', optimizer=adam, metrics=['accuracy'])   
 
-#All the magic will happen from here
-
-#Variables
-    if not os.exists(os.path.join(app.config['UPLOAD'], 'data.csv'):
-        return "Please upload your file first"
- 
-    n_steps = 5 #How many days to use to predict, required for the model
-    n_prediction = 30 #How many day to predict ahead in the future
+    final_forecast = forecast(n_prediction, LSTM_model,dataset_shaped,n_steps)
+    final_scaled = back_scale(y, np.array(final_forecast))
+    #final_scaled = pd.DataFrame(final_scaled)
+    def build_graph(final_scaled, inputs2, n_prediction):
+        #dates = np.array([datetime.datetime(inputs2.datetimeIndex(inputs2.index[0]).year,inputs2.datetimeIndex(inputs2.index[0]).month, inputs2.datetimeIndex(inputs2.index[0]).day, i, 0) for i in range(24)])
+        dataset = pd.DataFrame(final_scaled)
+        dataset.index = [x for x in pd.date_range(inputs2.index.values[0] + pd.offsets.Day(1),periods=n_prediction)]
+        img = BytesIO()
+        plt.figure(figsize=(15,8))
+        plt.xlabel('Dates')
+        plt.ylabel('Closing Prices')
+        plt.grid(True)
+        plt.plot(inputs2['Last'], 'blue', label='Historical Data')
+        plt.plot(dataset, 'red', label='Forecast')
+        plt.legend()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        graph_url = base64.b64encode(img.getvalue()).decode()
+        plt.close()
+        return 'data:image/png;base64,{}'.format(graph_url)
     
-    inputs2, cols = read_it() # First of all we read the data in in the right format
-    #input3 = scale_it(scaler, inputs2, cols) # the data what we read, needs to be scaled with MinMaxScaler
-    dataset_shaped = reshape(inputs2, 'Price') #'Last' #format the scaled data for LSTM use (part 1, where are formatting the columns into arrays)
-    X, y = split(dataset_shaped, n_steps) #Also need to format the Scaled data into 4D tensors
-    n_features = X.shape[2] # This wariable is required for the model, gives the feature dimension
-    
-    final_forecast = forecast(n_prediction, LSTM_model)
+    plot_url = build_graph(final_scaled, inputs2, n_prediction)
 
     #Return the prediction to the user
-    return render_template('result.html', prediction = final_forecast)
+    return render_template('result.html', prediction = final_scaled, plot_url = plot_url)
 
 #Start the Flask application
 if __name__ == '__main__':
