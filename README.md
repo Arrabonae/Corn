@@ -42,7 +42,7 @@ The Data is a daily break down of the continuous futures prices with additional 
 |Volume      |    Trading volume   |       Float or Int       |
 |Previous day open Interest      |    The total number of outstanding contracts that are held by market participants   |       Float or Int       |
 
-No transformation is required on the downloaded data. The Model can handle the outpot of Quandl as is.
+No transformation is required on the downloaded data. The Model can handle the output of Quandl as is.
 Data frequency is daily.
 
 ## Output
@@ -53,4 +53,21 @@ Outputs are:
 ![Price](pictures/landing.png)
 
 ## API call
-TO BE UPDATED
+When you run the code navigate to http://127.0.0.1:5000/. This home page will guide you through on the necessary steps:
+    1. upload the data
+    2. Click on Predict
+
+The Landing page will show the results of the model in Graph and Table format as for the next 30 days. 
+
+## Dependencies
+1. import os
+2. import requests
+3. import numpy as np
+4. import tensorflow as tf
+5. import pandas as pd
+6. from sklearn.preprocessing import MinMaxScaler
+7. from flask import Flask, request, jsonify, render_template, redirect
+8. import matplotlib.pyplot as plt
+9. from io import BytesIO
+10. import base64
+11. import datetime
