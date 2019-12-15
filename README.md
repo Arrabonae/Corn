@@ -4,8 +4,8 @@
 
 ### Assumptions in the Model
 1. The Model is pre-trained with 10years worth of data and additional noise added to help counter biases. There is no need to fit the Model to the Data;
-2. The Model currently makes predictions 10 days ahead of the actual historical data; and
-3. The Model is designed to be flexible in terms of prediction days (see item 2) and feature count. The Model can use more features than listed above. current version has no option for the user to change the prediction days value from 10.
+2. The Model currently makes predictions 30 days ahead of the actual historical data; and
+3. The Model is designed to be flexible in terms of prediction days (see item 2) and feature count. The Model can use more features than listed above. current version has no option for the user to change the prediction days value from 30.
 
 ### Technical architecture
 
@@ -18,6 +18,8 @@ Model has function built-in to format the input Data to a relevant tensor for pr
 ### Input information (“Data”)
 
 https://www.quandl.com/data/CHRIS/CME_C5
+
+Input format is **.csv** . No transofrmation required on the downloaded dataset.
 
 ### Details of the Data
 
@@ -35,13 +37,20 @@ The Data is a daily break down of the continuous futures prices with additional 
 |High        |    Highest price of the day |       Float or Int       |
 |Low         |    Lowest price of the day  |       Float or Int       |
 |Last        |    Closing price of the day |       Float or Int       |     Target value to predict
-|Volume      |    Trading volume in ‘000   |       Float or Int       |     Needs to be formatted before loading into the model.
+|Change      |    Price change DoD         |       Float or Int       |
+|Settle      |    The price used for determining profit or loss for the day, as well as margin requirements         |       Float or Int       |
+|Volume      |    Trading volume   |       Float or Int       |
+|Previous day open Interest      |    The total number of outstanding contracts that are held by market participants   |       Float or Int       |
 
-Rest of the Data is not essential for this model, but it can dynamically handle it.
+No transformation is required on the downloaded data. The Model can handle the outpot of Quandl as is.
 Data frequency is daily.
 
 ## Output
-Output is a python array of predictions (10 data points) of the Last price for the next 10 trading days.
+Outputs are:
+1. Graph that renders the Forecasts against the historical Data.
+2. HTML table that also shows all the new datapoints generated.
+
+![Price](pictures/landing.png)
 
 ## API call
 TO BE UPDATED
