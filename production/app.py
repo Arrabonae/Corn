@@ -7,7 +7,6 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from flask import Flask, request, jsonify, render_template, redirect
 import matplotlib.pyplot as plt
-import seaborn as sns
 from io import BytesIO
 import base64
 import datetime
