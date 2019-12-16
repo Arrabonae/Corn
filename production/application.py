@@ -15,7 +15,7 @@ import datetime
 application = Flask(__name__)
 
 # Create a directory in a known location to save files to.
-application.config['UPLOAD'] = os.path.join(os.getcwd(),'production/uploads')
+application.config['UPLOAD'] = os.path.join(os.getcwd(),'uploads')
 #app.config['UPLOAD'] = os.path.join(os.path.realpath('app.py'),'/uploads')
 
 #Load the data from upload
@@ -153,7 +153,7 @@ def predict():
         tf.keras.layers.Dense(1),
         ])
     #Load the pre-trained weights into the model
-    LSTM_model.load_weights(os.path.join(os.getcwd(),'production/weights_3.h5'))
+    LSTM_model.load_weights(os.path.join(os.getcwd(),'weights_3.h5'))
     adam=tf.keras.optimizers.Adam(lr=0.003711, epsilon=None, amsgrad=True, decay=0)
     LSTM_model.compile(loss ='mean_squared_error', optimizer=adam, metrics=['accuracy'])
     
