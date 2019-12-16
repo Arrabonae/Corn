@@ -59,6 +59,12 @@ When you run the code navigate to http://127.0.0.1:5000/. This home page will gu
 
 The Landing page will show the results of the model in Graph and Table format as for the next 30 days. 
 
+## API call through the cloud
+The Model is also available in the following cloud address:
+http://corn1612-env.4ewvmihpbn.us-east-2.elasticbeanstalk.com/
+
+All the input and output data are the same as the local implementation of the Model.
+
 ## Dependencies
 1. import os
 2. import requests
