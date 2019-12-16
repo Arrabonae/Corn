@@ -12,14 +12,14 @@ import base64
 import datetime
 
 #Create the Flask API
-app = Flask(__name__)
+application = Flask(__name__)
 
 # Create a directory in a known location to save files to.
-app.config['UPLOAD'] = os.path.join(os.getcwd(),'production/uploads')
+application.config['UPLOAD'] = os.path.join(os.getcwd(),'production/uploads')
 #app.config['UPLOAD'] = os.path.join(os.path.realpath('app.py'),'/uploads')
 
 #Load the data from upload
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 
 #This is basically renders the upload html page, and provides a User Interface for triggering the Prediciton function
 def upload_form():
@@ -27,16 +27,16 @@ def upload_form():
         if request.files:
             #os.unlink(app.config['UPLOAD'])
             upload = request.files["file"]
-            upload.save(os.path.join(app.config['UPLOAD'], 'data.csv'))
+            upload.save(os.path.join(application.config['UPLOAD'], 'data.csv'))
             return render_template('upload.html', message= 'Your file has been saved!', forward_message='Click here to Predict')
     return render_template('upload.html', forward_message='Please upload your data First!')
 
 #Define the Prediction function, 
-@app.route('/forward', methods=['GET', 'POST'])
+@application.route('/forward', methods=['GET', 'POST'])
 def predict():  
     #Read the data - in the proper format, loosing rows with empy cells
     def load_input_file():
-        inputs2 = pd.read_csv(os.path.join(app.config['UPLOAD'], 'data.csv'), parse_dates=['Date'])
+        inputs2 = pd.read_csv(os.path.join(application.config['UPLOAD'], 'data.csv'), parse_dates=['Date'])
         inputs2.set_index('Date', inplace=True) #Date added
         inputs2 = inputs2.dropna()
         cols = inputs2.columns
@@ -127,7 +127,7 @@ def predict():
 #All the magic will happen from here
 
 #Variables
-    if not os.path.exists(os.path.join(app.config['UPLOAD'], 'data.csv')):
+    if not os.path.exists(os.path.join(application.config['UPLOAD'], 'data.csv')):
         return print("Please upload your file first")
  
     n_steps = 5 #How many days to use to predict, required for the model
@@ -167,4 +167,4 @@ def predict():
 
 #Start the Flask application
 if __name__ == '__main__':
-    app.run(port=5000, debug=False)
+    application.run(host='0.0.0.0', debug=False)
