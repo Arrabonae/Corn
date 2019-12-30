@@ -64,16 +64,3 @@ The Model is also available in the following cloud address:
 http://corn1612-env.4ewvmihpbn.us-east-2.elasticbeanstalk.com/
 
 All the input and output data are the same as the local implementation of the Model.
-
-## Dependencies
-1. import os
-2. import requests
-3. import numpy as np
-4. import tensorflow as tf
-5. import pandas as pd
-6. from sklearn.preprocessing import MinMaxScaler
-7. from flask import Flask, request, jsonify, render_template, redirect
-8. import matplotlib.pyplot as plt
-9. from io import BytesIO
-10. import base64
-11. import datetime
