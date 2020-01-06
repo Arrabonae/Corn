@@ -61,7 +61,7 @@ The Landing page will show the results of the model in Graph and Table format as
 
 ## API call through the cloud
 The Model is also available in the following cloud address:
-# UPDATE 06 January 2020
-# (Environment has been terminated for resource saving purposes)
+**UPDATE 06 January 2020**
+**(Environment has been terminated for resource saving purposes)**
 
 All the input and output data are the same as the local implementation of the Model.
